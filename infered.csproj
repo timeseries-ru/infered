@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CsvHelper" Version="12.1.0" />
+    <PackageReference Include="Microsoft.ML.Probabilistic" Version="0.3.1810.501" />
+    <PackageReference Include="Microsoft.ML.Probabilistic.Compiler" Version="0.3.1810.501" />
+    <PackageReference Include="Pidgin" Version="1.5.0" />
+  </ItemGroup>
+
+</Project>
