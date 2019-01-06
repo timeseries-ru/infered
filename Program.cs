@@ -53,7 +53,7 @@ namespace infered
 
         public static readonly Parser<char, IExpr> Floating
             = Map((left, middle, right) => Double.Parse(left + "." + right), 
-                   DecimalNum, Tok("."), DecimalNum)
+                   DecimalNum, Tok("."), Digit.ManyString()) 
              .Select<IExpr>(value => new Literal(value))
              .Labelled("literal");
 

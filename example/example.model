@@ -2,7 +2,7 @@ Define unknown, which we want to know
 mean ~ GaussianFromMeanAndVariance(0.0, 0.1) / 2.0
 
 Define the coefficient
-alpha ~ -GaussianFromMeanAndVariance(mean, 0.1)
+alpha ~ -GaussianFromMeanAndVariance(mean, 0.01)
 
 Test some ops
 beta ~ (1.0 + alpha) * X1
