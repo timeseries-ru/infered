@@ -1,88 +1,100 @@
 # Infered
 
-Консольное приложение для выведения значений параметров вероятностных моделей.
+Console application for infering probabilistic models parameters. Simple.
 
-## Мотивация
-Существует множество отличных библиотек для вероятностного вывода, таких как
-PyMC3, Stan, Pyro, Tensorflow Probablity, - однако первые два требуют для 
-осуществления вывода инструментов для сборки, вторые два мне недоступны.
+## Motivation
 
-Поэтому были взяты библиотеки 
-1. Infer.Net - вероятностный вывод,
-2. Pidgin - парсер текстов,
-3. CSVHelper - парсер CSV.
+There are a set of beautiful tools for probabilistic inference, such as
+PyMC3, Stan, Pyro, Tensorflow Probability, but first two requires some build tools to run,
+second two are unavailable for me.
 
-## Сборка и запуск
-Чтобы собрать, потребуется dotnet-cli.
+Since it's hard to distribute binary without build tools, it's possible with:
+1. Infer.Net - for inference,
+2. Pidgin - for text parsing,
+3. CSVHelper - for CSV parsing.
+
+## Build and run
+Use `dotnet-cli`.
 
 ```
 dotnet restore
 dotnet publish --runtime your_runtime
 ```
 
-`your_runtime` - win10-x64, ubuntu-x64 и тому подобное.
+`your_runtime` - win10-x64, ubuntu-x64 and so on.
 
-Запуск требует передачи параметров командной строки:
+To run infering pass the command line parameters:
 
 ```
 infered data.csv model_definition.model parameter_name_to_infer_1 ... parameter_name_to_infer_N
 ```
 
-## CSV входных данных
-Все данные, по которым будет проводиться вывод должны быть числами. Никаких boolean или strings. Real only.
+## CSV input
+All data to be used, must be numerical. No boolean or strings. Real only.
 
-## Синтаксис файла модели
-Все интерпретируемые строки должны иметь формат
+## Model syntax
+All interpreted lines should have the following syntax:
 
 ```
 parameter_name ~ expression
 ```
 
-где `expression`, это одно из
+Other text will be ignored.
 
-1. Определение случайной величины (ниже подробнее),
-2. Математическое выражение с +, -, *, /, ^ (степень),
-3. Все числа должны быть в формате #.#, то есть с плавающей точкой, даже если это целое!
-4. В выражениях могут участвовать *только **определенные выше** по файлу случайные величины* или 
-*величины из файла данных* (по названиям столбцов),
-5. Вызов функции: Exp, Log, Logistic, Max, Min.
+`expression`, is one of the following:
 
-Определения случайной величины:
-1. GaussianFromMeanAndVariance(среднее, дисперсия),
-2. GammaFromShapeAndScale(размерность, масштаб),
-3. BetaFromMeanAndVariance(среднее, дисперсия).
+1. Random Variable Definition (details below),
+2. Mathematical expression: +, -, *, /, ^ (power),
+3. All numbers should be formatted as with floating point: #.#, even if they are integers!
+4. Every expression can use *only **defined previously** parameters* or 
+*values from CSV data* (by column names),
+5. Function call: Exp, Log, Logistic, Max, Min. Some inference cases on functions are problem. It's better to transform all your input before inference.
 
-[Более подробно здесь](https://dotnet.github.io/infer/userguide/Double%20factors.html).
+Random variables:
+1. GaussianFromMeanAndVariance(mean, variance),
+2. GammaFromShapeAndScale(shape, scale),
+3. BetaFromMeanAndVariance(mean, variance).
 
-## Пример
-В репозитории есть пример:
+[Details](https://dotnet.github.io/infer/userguide/Double%20factors.html).
 
-```
-mean ~ GaussianFromMeanAndVariance(0.0, 0.1) / 2.0
-alpha ~ -GaussianFromMeanAndVariance(mean, 0.1)
-beta ~ (1.0 + alpha) * X1
-eps ~ GaussianFromMeanAndVariance(0.0, 0.1)
-Y ~ Exp(X1 + beta + eps)
-```
-
-Он при запуске
+## Example
+In the repository you may find a sample:
 
 ```
-dotnet run example/example.csv example/example.model mean alpha eps
+Any string without tilde are not interpreted.
+You may write anything.
+
+mean1 ~ GaussianFromMeanAndVariance(1.0, 0.1)
+sd1 ~ GammaFromMeanAndVariance(1.0, 1.0)
+
+mean2 ~ GaussianFromMeanAndVariance(1.0, 0.1)
+sd2 ~ GammaFromMeanAndVariance(1.0, 1.0)
+
+alpha ~ GaussianFromMeanAndVariance(mean1, sd1)
+beta ~ GaussianFromMeanAndVariance(mean2, sd2)
+
+Define target
+Y ~ Exp(GaussianFromMeanAndVariance(alpha * X1 + beta * X2, 0.01))
 ```
 
-дает следующий вывод:
+Run with command:
+
+```
+dotnet run example/example.csv example/example.model alpha beta
+```
+
+The output will be:
 
 ```
 Compiling model...done.
 Iterating: 
 .........|.........|.........|.........|.........| 50
-mean: Gaussian(0.2973, 0.02)
-alpha: Gaussian(-1.486, 4.022e-146)
-eps: Gaussian(0.9267, 7.046e-147)
+alpha: Gaussian(2.011, 7.463e-05)
+beta: Gaussian(2.974, 0.00043)
 ```
 
-И всё благодаря Infer.Net :)
+![Fit chart](images/fit_chart.png?raw=1 "Fit chart")
+Thank's to Infer.Net :)
 
 ## License
 WTFPL.

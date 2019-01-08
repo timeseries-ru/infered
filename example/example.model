@@ -1,14 +1,14 @@
-Define unknown, which we want to know
-mean ~ GaussianFromMeanAndVariance(0.0, 0.1) / 2.0
+Any string without tilde are not interpreted.
+You may write anything.
 
-Define the coefficient
-alpha ~ -GaussianFromMeanAndVariance(mean, 0.01)
+mean1 ~ GaussianFromMeanAndVariance(1.0, 0.1)
+sd1 ~ GammaFromMeanAndVariance(1.0, 1.0)
 
-Test some ops
-beta ~ (1.0 + alpha) * X1
+mean2 ~ GaussianFromMeanAndVariance(1.0, 0.1)
+sd2 ~ GammaFromMeanAndVariance(1.0, 1.0)
 
-Some residuals?
-eps ~ GaussianFromMeanAndVariance(0.0, 0.1)
+alpha ~ GaussianFromMeanAndVariance(mean1, sd1)
+beta ~ GaussianFromMeanAndVariance(mean2, sd2)
 
 Define target
-Y ~ Exp(X1 + beta + eps)
+Y ~ Exp(GaussianFromMeanAndVariance(alpha * X1 + beta * X2, 0.01))
