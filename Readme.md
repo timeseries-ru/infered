@@ -94,7 +94,6 @@ beta: Gaussian(2.974, 0.00043)
 ```
 
 ![Fit chart](images/fit_chart.png?raw=1 "Fit chart")
-Thank's to Infer.Net :)
 
 ## License
 WTFPL.
